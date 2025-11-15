@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OrgFlow.Application.Posle;
 using OrgFlow.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<OrgFlowDbContext>(options =>
        options.UseSqlServer(connectionString)
     );
+
+builder.Services.AddScoped<IMessageFormatter, OrgFlowMessageFormatter>();
+builder.Services.AddScoped<IAppLogger, FileAppLogger>();
+
+builder.Services.AddScoped<INotificationSender, EmailNotificationSender>();
+builder.Services.AddScoped<INotificationSender, SlackNotificationSender>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
