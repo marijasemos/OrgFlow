@@ -10,7 +10,12 @@ namespace OrgFlow.Api.Controllers
     [Route("api/[controller]")]
     public class OrganizationsController : ControllerBase
     {
-        public readonly IOrganizationService _organizationService = new OrganizationService();
+        public readonly IOrganizationService _organizationService;
+
+        public OrganizationsController(IOrganizationService organizationService)
+        {
+            _organizationService = organizationService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organization>>> GetAll()

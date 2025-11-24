@@ -13,16 +13,11 @@ namespace OrgFlow.Infrastructure.Services
     public class OrganizationRepository : IOrganizationRepository
     {
         private readonly OrgFlowDbContext _context;
-        public OrganizationRepository()
+
+        public OrganizationRepository(OrgFlowDbContext context)
         {
-            var options = new DbContextOptionsBuilder<OrgFlowDbContext>()
-                .UseSqlServer("Server=MARIJA;Database=OrgFlow; Trusted_Connection=true; MultipleActiveResultSets = true; TrustServerCertificate=true")
-                .Options;
-
-            _context = new OrgFlowDbContext(options);
-
+            _context = context;
         }
-
 
         public async Task<Organization> CreateAsync(Organization organization)
         {
@@ -43,7 +38,6 @@ namespace OrgFlow.Infrastructure.Services
 
         public async Task<IReadOnlyList<Organization>> GetAllAsync()
         {
-            // Ako ne moraš da učitavaš Users/Requests, izbaci Include da bude brže
             return await _context.Organizations
                 .AsNoTracking()
                 .ToListAsync();

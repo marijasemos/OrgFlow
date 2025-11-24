@@ -16,7 +16,8 @@ namespace OrgFlow.Domain.Entities
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public int RequestTypeId { get; set; }
-        public RequestType? RequestType { get; set; }
+
+        public RequestType RequestType { get; set; }
         public RequestStatus Status { get; set; } = RequestStatus.Draft;
         public int CreatedByUserId { get; set; }
         public User? CreatedBy { get; set; }

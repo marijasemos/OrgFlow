@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using OrgFlow.Application.Helpers;
+using OrgFlow.Application.Interfaces;
+using OrgFlow.Application.Services;
 using OrgFlow.Infrastructure;
+using OrgFlow.Infrastructure.Interfaces;
+using OrgFlow.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +16,17 @@ builder.Services.AddDbContext<OrgFlowDbContext>(options =>
        options.UseSqlServer(connectionString)
     );
 
+builder.Services.AddTransient<IApprovalStrategy, LeaveApprovalStrategy>();
+builder.Services.AddTransient<IApprovalStrategy, RemoteWorkApprovalStrategy>();
 
+builder.Services.AddScoped<IApprovalStrategyResolver, ApprovalStrategyResolver>();
+builder.Services.AddTransient<IRequestFactory, RequestFactory>();
+
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<RequestWorkflowService>();
+builder.Services.AddTransient<RequestValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

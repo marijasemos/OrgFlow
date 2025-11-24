@@ -15,7 +15,12 @@ namespace OrgFlow.Application.Services
 {
     public class OrganizationService : IOrganizationService
     {
-        private readonly OrganizationRepository _organizationRepository = new OrganizationRepository();
+        private readonly IOrganizationRepository _organizationRepository;
+
+        public OrganizationService(IOrganizationRepository organizationRepository)
+        {
+            _organizationRepository = organizationRepository;
+        }
 
         public async Task<Organization> CreateAsync(OrganizationDto organizationDto)
         {
