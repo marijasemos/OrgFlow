@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OegFlow.Domain.DTOs;
+using OrgFlow.Application.Interfaces;
+using OrgFlow.Application.Services;
 using OrgFlow.Domain.Entites;
 
 namespace OrgFlow.Api.Controllers
@@ -7,72 +10,40 @@ namespace OrgFlow.Api.Controllers
     [Route("api/[controller]")]
     public class OrganizationsController : ControllerBase
     {
-        // za demo ćemo se praviti da nam je ovo “baza”
-        private static readonly List<Organization> _orgs = new()
-    {
-        new Organization { Id = 1, Name = "OrgFlow" },
-        new Organization { Id = 2, Name = "Cyclo Media" }
-    };
+        public readonly IOrganizationService _organizationService = new OrganizationService();
 
         [HttpGet]
-        public ActionResult<IEnumerable<Organization>> GetAll()
+        public async Task<ActionResult<IEnumerable<Organization>>> GetAll()
         {
-            return Ok(_orgs);
+            var result = await _organizationService.GetAllAsync();
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("GetAll")]
-        public ActionResult GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<OrganizationPaginated>> GetAllPaginated([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var query = _orgs.AsQueryable();
-
-            var total = query.Count();
-            var items = query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            var response = new
-            {
-                data = items,
-                pagination = new
-                {
-                    currentPage = page,
-                    pageSize = pageSize,
-                    totalItems = total,
-                    totalPages = (int)Math.Ceiling(total / (double)pageSize)
-                }
-            };
-
-            return Ok(response);
+            var result = await _organizationService.GetPaginatedAsync(page, pageSize);
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<Organization> Get(int id)
+        public async Task<ActionResult<Organization>> Get(int id)
         {
-            var org = _orgs.FirstOrDefault(x => x.Id == id);
-            if (org is null)
+            var result = await _organizationService.GetByIdAsync(id);
+            if (result is null)
                 return NotFound(); // slajd 16
 
-            return Ok(org);
+            return Ok(result);
         }
 
         [HttpPost]
-        public ActionResult<Organization> Create([FromBody] OrganizationDto dto)
+        public async Task<ActionResult<Organization>> Create([FromBody] OrganizationDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState); // slajd 24
-
-            var newOrg = new Organization
-            {
-                Id = _orgs.Max(x => x.Id) + 1,
-                Name = dto.Name
-            };
-
-            _orgs.Add(newOrg);
+            var result = await _organizationService.CreateAsync(dto);
 
             // slajd 16: 201 Created + Location
-            return CreatedAtAction(nameof(Get), new { id = newOrg.Id }, newOrg);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
     }
 }

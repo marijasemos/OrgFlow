@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OegFlow.Domain\OegFlow.Domain.csproj" />
+    <ProjectReference Include="..\OrgFlow.Infrastructure\OrgFlow.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
