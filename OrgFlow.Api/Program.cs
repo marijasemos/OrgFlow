@@ -1,6 +1,11 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using OrgFlow.Api.Middleware;
+using OrgFlow.Application;
+using OrgFlow.Application.Configuration;
 using OrgFlow.Application.Helpers;
 using OrgFlow.Application.Interfaces;
+using OrgFlow.Application.Requests.Queries;
 using OrgFlow.Application.Services;
 using OrgFlow.Infrastructure;
 using OrgFlow.Infrastructure.Interfaces;
@@ -16,6 +21,16 @@ builder.Services.AddDbContext<OrgFlowDbContext>(options =>
        options.UseSqlServer(connectionString)
     );
 
+builder.Services.Configure<ApprovalPolicySettings>(
+        builder.Configuration.GetSection("ApprovalPolicies")
+    );
+
+//builder.Services.AddMediatR(cfg =>
+//cfg.RegisterServicesFromAssembly(typeof(GetAllRequestsQuery).Assembly));    
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Marker).Assembly));
+
+builder.Services.AddScoped<IApprovalPolicyProvaider, ApprovalPolicyProvider>();
 builder.Services.AddTransient<IApprovalStrategy, LeaveApprovalStrategy>();
 builder.Services.AddTransient<IApprovalStrategy, RemoteWorkApprovalStrategy>();
 
@@ -40,6 +55,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+//app.UseGlobalExceptionHandling();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
