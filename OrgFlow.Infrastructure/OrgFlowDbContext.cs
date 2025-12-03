@@ -1,12 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OegFlow.Domain.Entities;
+using OegFlow.Domain.Models;
 using OrgFlow.Domain.Entites;
 using OrgFlow.Domain.Entities;
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace OrgFlow.Infrastructure
 {
-    public class OrgFlowDbContext : DbContext
+    public class OrgFlowDbContext :  IdentityDbContext<ApplicationUser, IdentityRole, string>
+
     {
         public OrgFlowDbContext(DbContextOptions<OrgFlowDbContext> options) : base(options)
         {

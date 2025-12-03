@@ -43,5 +43,14 @@ namespace OrgFlow.Infrastructure.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task<User?> GetUserBaseDataByEmailAsync(string email)
+        {
+            return await _dbSet
+                .Include(u => u.Position)
+                .Include(u => u.Department)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OegFlow.Domain.DTOs;
 using OrgFlow.Application.Interfaces;
@@ -11,6 +12,8 @@ namespace OrgFlow.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
+
     public class OrganizationsController : ControllerBase
     {
         private readonly IMediator _mediator;
