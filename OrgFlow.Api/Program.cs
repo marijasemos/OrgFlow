@@ -1,9 +1,14 @@
-using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using OegFlow.Domain;
+using OegFlow.Domain.Models;
 using OrgFlow.Api.Middleware;
 using OrgFlow.Application;
+using OrgFlow.Application.BackgroundServices;
 using OrgFlow.Application.Configuration;
 using OrgFlow.Application.Helpers;
 using OrgFlow.Application.Interfaces;
@@ -11,13 +16,9 @@ using OrgFlow.Application.Requests.Queries;
 using OrgFlow.Application.Services;
 using OrgFlow.Infrastructure;
 using OrgFlow.Infrastructure.Interfaces;
-using OrgFlow.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
-using OegFlow.Domain.Models;
-using Microsoft.OpenApi.Models;
 using OrgFlow.Infrastructure.Seeders;
+using OrgFlow.Infrastructure.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRolePermissionsRepository, RolePermissionsRepository>();
 builder.Services.AddScoped<IUserRolesRepository, UserRolesRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddHostedService<PendingRequestMonitor>();
+
 builder.Services.AddAuthorization(options =>
 {
     foreach (var perm in DefaultPermissions.All)

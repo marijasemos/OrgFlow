@@ -28,7 +28,7 @@ namespace OrgFlow.Application.Departments.Handlers
             DeleteDepartmentCommand request,
             CancellationToken cancellationToken)
         {
-            await _repo.DeleteAsync(request.Id);
+            await _repo.DeleteAsync(request.Id, cancellationToken);
             _logger.LogInformation("Department {Id} deleted (if existed)", request.Id);
         }
     }

@@ -1,87 +1,54 @@
-﻿using System;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
+using OrgFlow.Domain.Entities;
+using OrgFlow.Domain.Enums;
+using OrgFlow.Infrastructure.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using OrgFlow.Domain.Entities;
-using OrgFlow.Infrastructure.Interfaces;
 
 namespace OrgFlow.Infrastructure.Services
 {
-    public class RequestRepository : IRequestRepository
+    public class RequestRepository :  BaseRepository<RequestBase>, IRequestRepository
     {
         private readonly OrgFlowDbContext _context;
 
-        public RequestRepository(OrgFlowDbContext context)
+        public RequestRepository(OrgFlowDbContext context) : base(context)
         {
             _context = context;
         }
 
 
-        // -----------------------------
-        // READ
-        // -----------------------------
+  
 
-        public async Task<RequestBase?> GetByIdAsync(int id)
-        {
-            // Ef Core TPH: vratiće LeaveRequest ili RemoteWorkRequest instancu
-            return await _context.Requests
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id);
-        }
-
-        public async Task<IReadOnlyList<RequestBase>> GetAllAsync()
-        {
-            return await _context.Requests
-                .AsNoTracking()
-                .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
-        }
-
-        public async Task<IReadOnlyList<LeaveRequest>> GetLeaveRequestsAsync()
+        public async Task<IReadOnlyList<LeaveRequest>> GetLeaveRequestsAsync(CancellationToken token = default)
         {
             // TPH: OfType<LeaveRequest>() filtrira po tipu
             return await _context.Requests
                 .OfType<LeaveRequest>()
                 .AsNoTracking()
                 .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
+                .ToListAsync(token);
         }
 
-        public async Task<IReadOnlyList<RemoteWorkRequest>> GetRemoteWorkRequestsAsync()
+        public async Task<IReadOnlyList<RemoteWorkRequest>> GetRemoteWorkRequestsAsync(CancellationToken token = default)
         {
             return await _context.Requests
                 .OfType<RemoteWorkRequest>()
                 .AsNoTracking()
                 .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
+                .ToListAsync(token);
         }
 
-        // -----------------------------
-        // WRITE
-        // -----------------------------
-
-        public async Task AddAsync(RequestBase request)
+        public async Task<List<RequestBase>> GetStalePendingRequestsAsync(CancellationToken token = default)
         {
-            await _context.Requests.AddAsync(request);
-            await _context.SaveChangesAsync();
+            return await _context.Requests
+                .Where(x => x.Status == RequestStatus.InReview &&
+                            x.CreatedAt < DateTime.UtcNow.AddHours(-2))
+                .ToListAsync(token);
         }
 
-        public async Task UpdateAsync(RequestBase request)
-        {
-            _context.Requests.Update(request);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var existing = await _context.Requests.FirstOrDefaultAsync(r => r.Id == id);
-            if (existing is null)
-                return;
-
-            _context.Requests.Remove(existing);
-            await _context.SaveChangesAsync();
-        }
     }
 }

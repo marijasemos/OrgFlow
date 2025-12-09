@@ -42,7 +42,7 @@ namespace OrgFlow.Application.Departments.Handlers
                 IsActive = true
             };
 
-            await _repo.AddAsync(department);
+            await _repo.AddAsync(department, cancellationToken);
             _logger.LogInformation("Department {Id} created", department.Id);
 
             return department;

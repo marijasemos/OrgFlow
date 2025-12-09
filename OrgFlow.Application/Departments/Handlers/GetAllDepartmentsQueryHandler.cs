@@ -30,7 +30,7 @@ namespace OrgFlow.Application.Departments.Handlers
             CancellationToken cancellationToken)
         {
             _logger.LogInformation("Fetching all departments");
-            return await _repo.GetAllAsync();
+            return await _repo.GetAllAsync(cancellationToken);
         }
     }
 }

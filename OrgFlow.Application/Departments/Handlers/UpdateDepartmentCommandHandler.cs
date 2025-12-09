@@ -31,7 +31,7 @@ namespace OrgFlow.Application.Departments.Handlers
         {
             var dto = request.Dto;
 
-            var existing = await _repo.GetByIdAsync(dto.Id)
+            var existing = await _repo.GetByIdAsync(dto.Id, cancellationToken)
                 ?? throw new KeyNotFoundException($"Department {dto.Id} not found.");
 
             existing.OrganizationId = dto.OrganizationId;
@@ -39,7 +39,7 @@ namespace OrgFlow.Application.Departments.Handlers
             existing.Description = dto.Description;
             existing.IsActive = dto.IsActive;
 
-            await _repo.UpdateAsync(existing);
+            await _repo.UpdateAsync(existing, cancellationToken);
             _logger.LogInformation("Department {Id} updated", existing.Id);
 
             return existing;
